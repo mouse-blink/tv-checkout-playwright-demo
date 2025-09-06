@@ -1,15 +1,16 @@
-import { Page, Locator } from "@playwright/test";
+import { Page, Locator } from '@playwright/test';
 
 export class CookieBanner {
-    readonly selfLocator: Locator
-    readonly acceptButton: Locator 
+  readonly selfLocator: Locator;
 
-    constructor(page: Page) {
-        this.selfLocator = page.locator("#onetrust-banner-sdk");
-        this.acceptButton = this.selfLocator.locator("#onetrust-accept-btn-handler");
-    }
+  readonly acceptButton: Locator;
 
-    async acceptCookies() {
-        await this.acceptButton.click();
-    }
+  constructor(page: Page) {
+    this.selfLocator = page.locator('#onetrust-banner-sdk');
+    this.acceptButton = this.selfLocator.locator('#onetrust-accept-btn-handler');
+  }
+
+  async acceptCookies() {
+    await this.acceptButton.click();
+  }
 }

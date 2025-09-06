@@ -1,34 +1,48 @@
-import { test, expect } from "@playwright/test";
-import { CookieBanner } from "./pom/cookie-banner.pom";
-import { Webchat } from "./pom/webchat.pom";
+import { test, expect } from '@playwright/test';
+import { CookieBanner } from './pom/cookie-banner.pom';
+import { Webchat } from './pom/webchat.pom';
+import GEOLOCATIONS from './i18n/geolocations';
+import { PricingOverview } from './pom/pricing-overview.pom';
 
-test.beforeEach(async ({ page }) => {
-  await page.context().addCookies([
-    {
-      name: "geo-preference",
-      value: "en-EU",
-      domain: ".teamviewer.com",
-      path: "/",
-      httpOnly: false,
-      secure: false,
-      sameSite: "Lax",
-    },
-  ]);
-  await page.goto("https://www.teamviewer.com/en/");
-  const i18nResponse = page.waitForResponse((response) =>
-    response.url().startsWith("https://engage.teamviewer.com/api/in/i18n")
-  );
-  await new CookieBanner(page).acceptCookies();
-  await i18nResponse;
-});
+GEOLOCATIONS.forEach((location) => {
+  test.describe(`Prices Overview <${location.name}>`, () => {
+    test.beforeEach(async ({ page }) => {
+      await page.context().addCookies([
+        {
+          name: 'geo-preference',
+          value: location.locale,
+          domain: '.teamviewer.com',
+          path: '/',
+          httpOnly: false,
+          secure: false,
+          sameSite: 'Lax',
+        },
+      ]);
+      await page.goto(`https://www.teamviewer.com${location.endpoint}`);
+      const i18nResponse = page.waitForResponse((response) =>
+        response.url().startsWith('https://engage.teamviewer.com/api/in/i18n'),
+      );
 
-test("has title", async ({ page }) => {
-  await page.locator("#button-hero-pricing").click();
-  await page.waitForURL("**/pricing/overview/", { timeout: 120_000 });
-  const webChat = new Webchat(page);
-  await expect(webChat.closeButton).toBeVisible({ timeout: 120_000 });
-  await webChat.close();
-  await expect(page).toHaveTitle(`Prices and license overview | TeamViewer`);
-  await expect(page.locator("#pricing-premium")).toHaveScreenshot();
-  await expect(page.locator("#pricing-corporate")).toHaveScreenshot();
+      await new CookieBanner(page).acceptCookies();
+      await i18nResponse;
+
+      await page.locator('#button-hero-pricing').click();
+      await page.waitForURL('**/pricing/overview/', { timeout: 120_000 });
+      const webChat = new Webchat(page);
+
+      await expect(webChat.closeButton).toBeVisible({ timeout: 120_000 });
+      await webChat.close();
+    });
+
+    test('has title', async ({ page }) => {
+      await expect(page).toHaveTitle(location.pages.pricing.title);
+    });
+
+    test('Has Prices', async ({ page }) => {
+      const pricingOverview = new PricingOverview(page);
+
+      await expect(pricingOverview.premiumPlan).toHaveScreenshot();
+      await expect(pricingOverview.corporatePlan).toHaveScreenshot();
+    });
+  });
 });
