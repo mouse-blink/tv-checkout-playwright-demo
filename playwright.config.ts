@@ -31,7 +31,7 @@ export default defineConfig({
     baseURL: 'https://service.teamviewer.com',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on',
+    trace: 'retain-on-failure',
 
     /* Set location and timezone for Berlin */
     locale: 'de-DE',

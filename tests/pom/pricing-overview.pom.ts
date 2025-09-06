@@ -1,6 +1,7 @@
 import { Locator, Page } from '@playwright/test';
+import PriceOffer from './price-offer.pom';
 
-export class PricingOverview {
+export default class PricingOverview {
   page: Page;
 
   premiumPlan: Locator;
@@ -12,4 +13,9 @@ export class PricingOverview {
     this.premiumPlan = page.locator('#pricing-premium');
     this.corporatePlan = page.locator('#pricing-corporate');
   }
+
+  async selectPremiumPlan(): Promise<PriceOffer> {
+    return new PriceOffer(this.premiumPlan);
+  }
+
 }

@@ -1,6 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 
-export class CookieBanner {
+export default class CookieBanner {
   readonly selfLocator: Locator;
 
   readonly acceptButton: Locator;
